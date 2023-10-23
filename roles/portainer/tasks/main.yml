@@ -20,6 +20,7 @@
         ports:
           - "{{ portainer_port }}:9443"
         restart_policy: unless-stopped
+        network_mode: host
         memory: "{{ portainer_memory }}"
         labels:
           traefik.enable: "{{ portainer_available_externally | string }}"
