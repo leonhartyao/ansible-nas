@@ -1,0 +1,45 @@
+---
+- name: Start openbooks
+  block:
+    - name: Create openbooks Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ openbooks_data_directory }}/config"
+
+    - name: openbooks Docker Container
+      community.docker.docker_container:
+        name: "{{ openbooks_container_name }}"
+        image: evanbuss/openbooks:latest
+        pull: true
+        # command: --persist
+        command: --persist --name {{ openbook_irc_username }} --useragent "HexChat 2.16.1" --log true
+        volumes:
+          - "{{ openbooks_data_directory }}/config:/config"
+          - "{{ openbooks_books_root }}:/books"
+        # network_mode: "host"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+          PUID: "{{ openbooks_user_id }}"
+          PGID: "{{ openbooks_group_id }}"
+        ports:
+          - "{{ openbooks_port }}:80"
+        restart_policy: unless-stopped
+        memory: "{{ openbooks_memory }}"
+        labels:
+          traefik.enable: "{{ openbooks_available_externally | string }}"
+          traefik.http.routers.openbooks.rule: "Host(`openbooks.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.openbooks.tls.certresolver: "letsencrypt"
+          traefik.http.routers.openbooks.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.openbooks.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.services.openbooks.loadbalancer.server.port: "2500"
+  when: openbooks_enabled is true
+
+- name: Stop openbooks
+  block:
+    - name: Stop openbooks
+      community.docker.docker_container:
+        name: "{{ openbooks_container_name }}"
+        state: absent
+  when: openbooks_enabled is false

@@ -1,0 +1,24 @@
+---
+openbooks_enabled: false
+openbooks_available_externally: false
+
+# uid / gid
+openbooks_user_id: "0"
+openbooks_group_id: "0"
+
+# directories
+openbooks_data_directory: "{{ docker_home }}/openbooks"
+openbooks_books_root: "{{ books_root }}"
+
+# network
+openbooks_port: "2500"
+openbooks_hostname: "openbooks"
+
+# IRC
+openbook_irc_username: chao
+
+# specs
+openbooks_memory: 1g
+
+# docker
+openbooks_container_name: openbooks
