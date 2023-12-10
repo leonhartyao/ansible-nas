@@ -26,6 +26,10 @@
           ND_SCANSCHEDULE: "{{ navidrome_scan_schedule }}"
           ND_LOGLEVEL: "{{ navidrome_log_level }}"
           ND_SESSIONTIMEOUT: "{{ navidrome_session_timeout }}"
+          ND_ENABLETRANSCODINGCONFIG: "true"
+          ND_TRANSCODINGCACHESIZE: "4000M"
+          ND_SPOTIFY_ID: "{{ navidrome_spotify_id }}"
+          ND_SPOTIFY_SECRET: "{{ navidrome_spotify_secret }}"
         restart_policy: unless-stopped
         memory: "{{ navidrome_memory }}"
         labels:
