@@ -11,7 +11,7 @@
         - ansible-nas-users
         - ansible-nas
 
-    - role: bertvv.samba
+    - role: vladgh.samba.server
       tags:
         - samba
         - skip_ansible_lint
@@ -22,15 +22,10 @@
         - skip_ansible_lint
 
     - role: geerlingguy.docker
-      when: ansible_architecture == "x86_64"
+      vars:
+        docker_apt_filename: download_docker_com_linux_ubuntu
       tags:
         - docker
-        - skip_ansible_lint
-
-    - role: geerlingguy.docker_arm
-      when: ansible_architecture == "aarch64"
-      tags:
-        - docker_arm
         - skip_ansible_lint
 
     ###
@@ -77,6 +72,10 @@
     - role: calibre
       tags:
         - calibre
+
+    - role: calibreweb
+      tags:
+        - calibreweb
 
     - role: cloudcmd
       tags:
@@ -134,6 +133,10 @@
       tags:
         - firefly
 
+    - role: flaresolverr
+      tags:
+        - flaresolverr
+
     - role: freshrss
       tags:
         - freshrss
@@ -182,6 +185,10 @@
       tags:
         - homebridge
 
+    - role: homepage
+      tags:
+        - homepage
+
     - role: jackett
       tags:
         - jackett
@@ -213,6 +220,10 @@
     - role: mealie
       tags:
         - mealie
+
+    - role: minecraft-bedrock-server
+      tags:
+        - minecraft-bedrock-server
 
     - role: minecraft-server
       tags:
@@ -334,6 +345,10 @@
       tags:
         - radarr
 
+    - role: romm
+      tags:
+        - romm
+
     - role: route53_ddns
       tags:
         - route53_ddns
@@ -349,6 +364,10 @@
     - role: sickchill
       tags:
         - sickchill
+
+    - role: silverbullet
+      tags:
+        - silverbullet
 
     - role: sonarr
       tags:
@@ -373,6 +392,10 @@
     - role: thelounge
       tags:
         - thelounge
+
+    - role: threadfin
+      tags:
+        - threadfin
 
     - role: tiddlywiki
       tags:
@@ -401,6 +424,10 @@
     - role: utorrent
       tags:
         - utorrent
+
+    - role: valheim
+      tags:
+        - valheim
 
     - role: virtual_desktop
       tags:
