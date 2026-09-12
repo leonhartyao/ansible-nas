@@ -5,8 +5,8 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
-        recurse: yes
-      with_items:
+        recurse: true
+      loop:
         - "{{ code_root }}/gitea"
         - "{{ gitea_data_directory }}/gitea"
         - "{{ gitea_data_directory }}/mysql"
@@ -38,29 +38,40 @@
           - "{{ gitea_port_http }}:3000"
           - "{{ gitea_port_ssh }}:22"
         links:
-          - gitea-mysql:db
+          - "{{ gitea_mysql_container_name }}:db"
+
         env:
-          DB_TYPE: "mysql"
-          DB_HOST: "db:3306"
-          DB_NAME: "gitea"
-          DB_USER: "gitea"
-          DB_PASSWD: "gitea"
-          RUN_MODE: "prod"
-          SSH_DOMAIN: "{{ ansible_nas_hostname }}"
-          SSH_PORT: "22"
-          ROOT_URL: "http://{{ gitea_hostname }}.{{ ansible_nas_domain }}/"
+          # Gitea
+          GITEA__server__DOMAIN: "{{ gitea_hostname }}.{{ ansible_nas_domain }}"
+          GITEA__server__ROOT_URL: "https://{{ gitea_hostname }}.{{ ansible_nas_domain }}/"
+          GITEA__server__SSH_DOMAIN: "{{ gitea_ssh_hostname }}.{{ ansible_nas_domain }}"
+          GITEA__server__SSH_PORT: "{{ gitea_port_ssh }}"
+
+          # Database
+          GITEA__database__DB_TYPE: "mysql"
+          GITEA__database__HOST: "db:3306"
+          GITEA__database__NAME: "gitea"
+          GITEA__database__USER: "gitea"
+          GITEA__database__PASSWD: "gitea"
+
+          # Runtime
+          GITEA__server__RUN_MODE: "prod"
           USER_UID: "1000"
           USER_GID: "1000"
         restart_policy: unless-stopped
         memory: "{{ gitea_memory }}"
         labels:
           traefik.enable: "{{ gitea_available_externally | string }}"
-          traefik.http.routers.gitea.rule: "Host(`{{ gitea_hostname }}.{{ ansible_nas_domain }}`)"
+
+          traefik.http.routers.gitea.rule: >-
+            Host(`{{ gitea_hostname }}.{{ ansible_nas_domain }}`)
+
+          traefik.http.routers.gitea.tls: "true"
           traefik.http.routers.gitea.tls.certresolver: "letsencrypt"
           traefik.http.routers.gitea.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.gitea.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.services.gitea.loadbalancer.server.port: "3000"
-  when: gitea_enabled is true
+  when: gitea_enabled | bool
 
 - name: Stop Gitea
   block:
@@ -69,7 +80,7 @@
         name: "{{ gitea_container_name }}"
         state: absent
 
-    - name: Stop Gitea Mysql
+    - name: Stop Gitea MySQL
       community.docker.docker_container:
         name: "{{ gitea_mysql_container_name }}"
         state: absent
